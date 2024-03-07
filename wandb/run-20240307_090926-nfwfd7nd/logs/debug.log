@@ -1,0 +1,27 @@
+2024-03-07 09:09:26,358 INFO    MainThread:7213 [wandb_setup.py:_flush():76] Current SDK version is 0.16.1
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_setup.py:_flush():76] Configure stats pid to 7213
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_setup.py:_flush():76] Loading settings from /home/aiotlabws/.config/wandb/settings
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_setup.py:_flush():76] Loading settings from /mnt/disk2/ducanh/gap_filling/wandb/settings
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'train_linear.py', 'program_abspath': '/mnt/disk2/ducanh/gap_filling/train_linear.py', 'program': 'train_linear.py'}
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_init.py:_log_setup():524] Logging user logs to /mnt/disk2/ducanh/gap_filling/wandb/run-20240307_090926-nfwfd7nd/logs/debug.log
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_init.py:_log_setup():525] Logging internal logs to /mnt/disk2/ducanh/gap_filling/wandb/run-20240307_090926-nfwfd7nd/logs/debug-internal.log
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_init.py:init():564] calling init triggers
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_init.py:init():571] wandb.init called with sweep_config: {}
+config: {'seed': 42, 'dataset': 'beijing', 'train_pct': 0.6, 'test_pct': 0.2, 'output_stdgi': 64, 'en_hid1': 64, 'en_hid2': 64, 'dis_hid': 64, 'stdgi_noise_min': 0.4, 'stdgi_noise_max': 0.7, 'cnn_in_features': 6, 'decoder_epochs': 50, 'cnn_model': 'cnn', 'group_name': 'ver1_beijing', 'use_wandb': True, 'name': 'gap_filling', 'lr_stdgi': 0.001, 'lr_cnn': 0.001, 'batch_size': 32, 'num_epochs_stdgi': 50, 'num_epochs_cnn': 10, 'num_epochs_linear': 10, 'n_iterations': 300, 'patience': 5, 'delta_stdgi': 0.01, 'delta_decoder': 0.01, 'session_name': 'Run test', 'data_dir': '/mnt/disk2/ducanh/gap_filling/processed_data/merra-2-idw/', 'era5_dir': '/mnt/disk2/ducanh/gap_filling/processed_data/era5_extracted/merged_idw/', 'data_path': '/mnt/disk2/ducanh/AQInterpolation/station_data/beijing/', 'train_station': [0, 1, 2, 3, 4], 'valid_station': [5, 6, 7], 'test_station': [8, 9, 10, 11], 'features': ['PM2.5', 'PM10', 'SO2', 'NO2', 'CO', 'O3', 'PRES', 'RAIN', 'TEMP', 'WSPM', 'DEWP'], 'idx_climate': 6, 'input_dim': 11, 'num_input_station': 5}
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_init.py:init():614] starting backend
+2024-03-07 09:09:26,359 INFO    MainThread:7213 [wandb_init.py:init():618] setting up manager
+2024-03-07 09:09:26,503 INFO    MainThread:7213 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2024-03-07 09:09:26,523 INFO    MainThread:7213 [wandb_init.py:init():624] backend started and connected
+2024-03-07 09:09:26,536 INFO    MainThread:7213 [wandb_init.py:init():716] updated telemetry
+2024-03-07 09:09:26,536 INFO    MainThread:7213 [wandb_init.py:init():749] communicating run to backend with 90.0 second timeout
+2024-03-07 09:09:27,451 INFO    MainThread:7213 [wandb_run.py:_on_init():2254] communicating current version
+2024-03-07 09:09:27,607 INFO    MainThread:7213 [wandb_run.py:_on_init():2263] got version response upgrade_message: "wandb version 0.16.4 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2024-03-07 09:09:27,608 INFO    MainThread:7213 [wandb_init.py:init():800] starting run threads in backend
+2024-03-07 09:09:57,705 INFO    MainThread:7213 [wandb_run.py:_console_start():2233] atexit reg
+2024-03-07 09:09:57,728 INFO    MainThread:7213 [wandb_run.py:_redirect():2088] redirect: wrap_raw
+2024-03-07 09:09:57,728 INFO    MainThread:7213 [wandb_run.py:_redirect():2153] Wrapping output streams.
+2024-03-07 09:09:57,728 INFO    MainThread:7213 [wandb_run.py:_redirect():2178] Redirects installed.
+2024-03-07 09:09:57,729 INFO    MainThread:7213 [wandb_init.py:init():841] run started, returning control to user process

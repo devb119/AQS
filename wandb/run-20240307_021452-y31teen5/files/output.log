@@ -1,0 +1,29 @@
+  0%|                                                                                                                           | 0/4 [00:01<?, ?it/s]
+Traceback (most recent call last):
+  File "train_linear.py", line 101, in <module>
+    loss = train_atten_stdgi(
+  File "/mnt/disk2/ducanh/gap_filling/src/utils/train_func.py", line 24, in train_atten_stdgi
+    for data in tqdm(dataloader):
+  File "/mnt/disk1/anaconda3/envs/along/lib/python3.8/site-packages/tqdm/std.py", line 1182, in __iter__
+    for obj in iterable:
+  File "/mnt/disk1/anaconda3/envs/along/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 630, in __next__
+    data = self._next_data()
+  File "/mnt/disk1/anaconda3/envs/along/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1345, in _next_data
+    return self._process_data(data)
+  File "/mnt/disk1/anaconda3/envs/along/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1371, in _process_data
+    data.reraise()
+  File "/mnt/disk1/anaconda3/envs/along/lib/python3.8/site-packages/torch/_utils.py", line 694, in reraise
+    raise exception
+AttributeError: Caught AttributeError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/mnt/disk1/anaconda3/envs/along/lib/python3.8/site-packages/torch/utils/data/_utils/worker.py", line 308, in _worker_loop
+    data = fetcher.fetch(index)
+  File "/mnt/disk1/anaconda3/envs/along/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 51, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/mnt/disk1/anaconda3/envs/along/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 51, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/mnt/disk2/ducanh/gap_filling/src/utils/data_loader.py", line 160, in __getitem__
+    era = self.load_era5(index)
+  File "/mnt/disk2/ducanh/gap_filling/src/utils/data_loader.py", line 145, in load_era5
+    min_val = self.era['min'][i - 2]
+AttributeError: 'AQDataset' object has no attribute 'era'

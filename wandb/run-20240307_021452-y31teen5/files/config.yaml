@@ -1,0 +1,166 @@
+wandb_version: 1
+
+seed:
+  desc: null
+  value: 42
+dataset:
+  desc: null
+  value: beijing
+train_pct:
+  desc: null
+  value: 0.6
+test_pct:
+  desc: null
+  value: 0.2
+output_stdgi:
+  desc: null
+  value: 64
+en_hid1:
+  desc: null
+  value: 64
+en_hid2:
+  desc: null
+  value: 64
+dis_hid:
+  desc: null
+  value: 64
+stdgi_noise_min:
+  desc: null
+  value: 0.4
+stdgi_noise_max:
+  desc: null
+  value: 0.7
+cnn_in_features:
+  desc: null
+  value: 6
+decoder_epochs:
+  desc: null
+  value: 50
+cnn_model:
+  desc: null
+  value: cnn
+group_name:
+  desc: null
+  value: ver1_beijing
+use_wandb:
+  desc: null
+  value: true
+name:
+  desc: null
+  value: gap_filling
+lr_stdgi:
+  desc: null
+  value: 0.001
+lr_cnn:
+  desc: null
+  value: 0.001
+batch_size:
+  desc: null
+  value: 32
+num_epochs_stdgi:
+  desc: null
+  value: 50
+num_epochs_cnn:
+  desc: null
+  value: 10
+num_epochs_linear:
+  desc: null
+  value: 10
+n_iterations:
+  desc: null
+  value: 300
+patience:
+  desc: null
+  value: 5
+delta_stdgi:
+  desc: null
+  value: 0.05
+delta_decoder:
+  desc: null
+  value: 0.05
+session_name:
+  desc: null
+  value: Run test
+data_dir:
+  desc: null
+  value: /mnt/disk2/ducanh/gap_filling/processed_data/merra-2-idw/
+era5_dir:
+  desc: null
+  value: /mnt/disk2/ducanh/gap_filling/processed_data/era5_extracted/merged_idw/
+data_path:
+  desc: null
+  value: /mnt/disk2/ducanh/AQInterpolation/station_data/beijing/
+train_station:
+  desc: null
+  value:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+valid_station:
+  desc: null
+  value:
+  - 5
+  - 6
+  - 7
+test_station:
+  desc: null
+  value:
+  - 8
+  - 9
+  - 10
+  - 11
+features:
+  desc: null
+  value:
+  - PM2.5
+  - PM10
+  - SO2
+  - NO2
+  - CO
+  - O3
+  - PRES
+  - RAIN
+  - TEMP
+  - WSPM
+  - DEWP
+idx_climate:
+  desc: null
+  value: 6
+input_dim:
+  desc: null
+  value: 11
+num_input_station:
+  desc: null
+  value: 5
+_wandb:
+  desc: null
+  value:
+    python_version: 3.8.18
+    cli_version: 0.16.1
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: true
+    start_time: 1709752492.79015
+    t:
+      1:
+      - 1
+      - 5
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 53
+      - 55
+      3:
+      - 13
+      - 16
+      - 23
+      4: 3.8.18
+      5: 0.16.1
+      8:
+      - 2
+      - 5
+      13: linux-x86_64

@@ -1,0 +1,12 @@
+> /mnt/disk2/ducanh/gap_filling/train_linear.py(100)<module>()
+-> stdgi.train()
+Traceback (most recent call last):
+  File "train_linear.py", line 100, in <module>
+    stdgi.train()
+  File "train_linear.py", line 100, in <module>
+    stdgi.train()
+  File "/mnt/disk1/anaconda3/envs/along/lib/python3.8/bdb.py", line 88, in trace_dispatch
+    return self.dispatch_line(frame)
+  File "/mnt/disk1/anaconda3/envs/along/lib/python3.8/bdb.py", line 113, in dispatch_line
+    if self.quitting: raise BdbQuit
+bdb.BdbQuit
