@@ -122,7 +122,7 @@ def train_1_loss(combined_model, dataloader, test_dataloaders, optimizer, device
     epoch_loss = 0
     for data in tqdm(dataloader):
         if not early_stopping.early_stop:
-            x, G, l, cnn_x, y = data['X'].float().to(device), data['G'].float().to(device), data['l'].float().to(device), data['X_satellite'].to(device), data['Y'].float().to(device)
+            x, G, l, cnn_x, y = data['X'].to(torch.float32).to(device), data['G'].to(torch.float32).to(device), data['l'].to(torch.float32).to(device), data['X_satellite'].to(device), data['Y'].to(torch.float32).to(device)
             lat_index, lon_index = data['lat_lon']
             data = (x,G,l, cnn_x, lat_index, lon_index, y)
             loss = combined_model.get_loss(data)
@@ -143,6 +143,8 @@ def train_1_loss(combined_model, dataloader, test_dataloaders, optimizer, device
                     early_stopping(mean_testing_loss, combined_model)
                     wandb.log({"valid_loss": mean_testing_loss,
                             "train_loss": loss.item()})
+        else:
+            break
 
     # Return epoch summary results
     return epoch_loss/len(dataloader)

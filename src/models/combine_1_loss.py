@@ -28,9 +28,10 @@ class Combine1Loss(nn.Module):
     def forward(self, data):
         x, G, l, cnn_x, lat_index, lon_index, y = data
         # cnn_representation = self.get_cnn_representation(cnn_x, lat_index, lon_index)
-        cnn_representation = self.cnn_encoder(cnn_x[:, 2:, lat_index[0], lon_index[0]])
+        # import pdb; pdb.set_trace()
+        cnn_representation = self.cnn_encoder(cnn_x[:, 2:, lat_index[0], lon_index[0]].to(torch.float32))
         gnn_representation = self.get_idw_representation(x,G,l)
-        
+        # import pdb; pdb.set_trace()
         embedded_y = torch.cat((cnn_representation, gnn_representation.squeeze()), dim=1) # (batch_size, 128)
         y_pred = self.decoder(embedded_y)
         return y_pred

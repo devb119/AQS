@@ -206,8 +206,6 @@ class AQDataset(Dataset):
             l = self.get_reverse_distance_matrix(
                 list_selected_train_station, picked_target_station_int
             )
-
-            climate = 1
         sample = {
             "X": x,
             "merra": merra,
@@ -215,7 +213,7 @@ class AQDataset(Dataset):
             "X_satellite": concat_data,
             "Y": np.array([y]),
             "l": np.array(l),
-            "climate": climate,
+            "climate": 1,
             "lat_lon": (lat_index, lon_index)
         }
         

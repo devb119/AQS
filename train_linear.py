@@ -166,7 +166,10 @@ if __name__ == '__main__':
     
     print("Start testing")
     for test_station in args.test_station:
-        test_dataset  = AQDataset(data_arr, climate_arr, location_, 12,True,False,args,test_station)
+        test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, input_len=12,
+                                    valid=False,test=True,args=args,test_station=test_station,
+                                    merra_scaler=merra_dict,
+                                    era_scaler=era_dict)
 
         test_dataloader = DataLoader(
             test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=8

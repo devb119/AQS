@@ -4,8 +4,8 @@ import numpy as np
 
 # [lat, lon, 'AOD', 'black_carbon', 'dust', 'organic_carbon', 'sea_salt', 'sulfate']
 # ['lat', 'lon', '10 metre U wind component', '10 metre V wind component', '2 metre temperature', 'Boundary layer height', 'Surface pressure']
-min_max = {"min": [9999999]*6, "max": [-9999999]*6}
-for file in tqdm(os.scandir("/mnt/disk2/ducanh/gap_filling/processed_data/merra-2-idw")):
+min_max = {"min": [9999999]*5, "max": [-9999999]*5}
+for file in tqdm(os.scandir("/mnt/disk2/ducanh/gap_filling/processed_data/era5_extracted/merged_idw")):
     data = np.load(file.path)
     for i in range(2, 7):
         feature_values = data[i,:,:].flatten()
