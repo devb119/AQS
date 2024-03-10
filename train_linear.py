@@ -112,12 +112,12 @@ if __name__ == '__main__':
                     args = args
                 )
     ## Load  best stdgi model
-    # load_model(stdgi, f"/mnt/disk2/ducanh/AQInterpolation/output/ver1_beijing/checkpoint/stdgi_stdgi.pt")
-    load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
+    load_model(stdgi, f"/mnt/disk2/ducanh/gap_filling/output/ver1_beijing/checkpoint/stdgi_gap_filling.pt")
+    # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
     
     # Training with decoder
     linear = LinearModel(in_features=11, out_features=64, num_hidden_units=256).to(device)
-    decoder = Decoder(in_ft=128, out_ft=1, fc_hid_dim=256, cnn_hid_dim=256).to(device)
+    decoder = Decoder(in_ft=64, out_ft=1, fc_hid_dim=256, cnn_hid_dim=256).to(device)
     combined_model = Combine1Loss(stdgi.encoder, linear, decoder)
     optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= 0.001)
     
