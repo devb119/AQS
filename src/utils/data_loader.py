@@ -36,7 +36,7 @@ class AQDataset(Dataset):
         
         self.features = ['AOD', 'black_carbon', 'dust', 'organic_carbon', 'sea_salt', 'sulfate']
         self.dataset = args.dataset
-        self.cnn_in_features = args.cnn_in_features
+        self.satellite_in_features = args.satellite_in_features
         
         self.input_len = input_len
         self.test = test
@@ -145,6 +145,10 @@ class AQDataset(Dataset):
             min_val = self.merra_scaler['min'][i - 2]
             max_val = self.merra_scaler['max'][i - 2]
             arr[i, :, :] = ((arr[i, :, :] - min_val) * (1 - (-1)) / (max_val - min_val)) + (-1)
+        # Remove one variable along the first dimension for feature selection
+        # Keep first 2 vars (lat, lon), skip AOD, keep the remainings
+        # new_arr = np.concatenate((arr[:6], arr[7:]), axis=0)
+        # new_arr = arr[:7]
         return arr
     
     # ['lat', 'lon', '10 metre U wind component', '10 metre V wind component', '2 metre temperature', 'Boundary layer height', 'Surface pressure']
@@ -162,7 +166,9 @@ class AQDataset(Dataset):
             min_val = self.era_scaler['min'][i - 2]
             max_val = self.era_scaler['max'][i - 2]
             arr[i, :, :] = ((arr[i, :, :] - min_val) * (1 - (-1)) / (max_val - min_val)) + (-1)
-        return arr
+        # new_arr = np.concatenate((arr[:5], arr[6:]), axis=0)
+        new_arr = arr[:6]
+        return new_arr
 
     def convert_data_to_Cartesian(self, arr):
         new_arr = np.expand_dims(arr,1)

@@ -21,7 +21,7 @@ def get_options():
     parser.add_argument("--stdgi_noise_max", type=float, default=0.7)
     
     ## CNN architecture
-    parser.add_argument("--cnn_in_features", type=int, default= 6)
+    parser.add_argument("--satellite_in_features", type=int, default= 11)
     parser.add_argument("--decoder_epochs", type=int, default = 50)
     parser.add_argument("--cnn_model", type=str, default= "cnn", choices=["alexnet", "cnn"])
     
@@ -68,6 +68,7 @@ def get_options():
         
         # args.features = ["PM2.5","PM10","SO2","NO2","CO", "O3","PRES", "RAIN", "TEMP","WSPM", 'black_carbon', 'dust', 'organic_carbon', 'SO2', 'sea_salt', 'AOD']
         args.features = ["PM2.5","PM10","SO2","NO2","CO", "O3","PRES", "RAIN", "TEMP","WSPM", "DEWP"]
+        args.satellite_features = ['AOD', 'black_carbon', 'dust', 'organic_carbon', 'sea_salt', 'sulfate', '10 metre U wind component', '10 metre V wind component', '2 metre temperature', 'Boundary layer height', 'Surface pressure']
         args.idx_climate = 6
         args.input_dim = len(args.features)
         # args.input_dim = len(args.features) + 8

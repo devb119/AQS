@@ -48,6 +48,8 @@ if __name__ == '__main__':
     
     train_dataset = AQDataset(data_arr, climate_arr, location_, 12, merra_dict, era_dict, args=args)
     
+    # import pdb; pdb.set_trace()
+    
     
     stdgi = Attention_STDGI(
         in_ft=args.input_dim,
@@ -116,8 +118,8 @@ if __name__ == '__main__':
     # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
     
     # Training with decoder
-    linear = LinearModel(in_features=11, out_features=64, num_hidden_units=256).to(device)
-    decoder = Decoder(in_ft=64, out_ft=1, fc_hid_dim=256, cnn_hid_dim=256).to(device)
+    linear = LinearModel(in_features=args.satellite_in_features, out_features=64, num_hidden_units=256).to(device)
+    decoder = Decoder(in_ft=128, out_ft=1, fc_hid_dim=256, cnn_hid_dim=256).to(device)
     combined_model = Combine1Loss(stdgi.encoder, linear, decoder)
     optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= 0.001)
     
@@ -201,7 +203,8 @@ if __name__ == '__main__':
         np.array(list_acc),
         columns=["STATION", "MAE", "MSE", "MAPE", "MDAPE", "RMSE", "R2", "CORR"],
     )
-    saved_log = "_".join(args.features)
+    # saved_log = "_".join(args.features)
+    saved_log = "satellite_feature_selection"
     import os
     if not os.path.exists(f"log_infor/{saved_log}"):
         os.makedirs(f"log_infor/{saved_log}")
