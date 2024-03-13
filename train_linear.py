@@ -117,9 +117,9 @@ if __name__ == '__main__':
     
     # Training with decoder
     linear = LinearModel(in_features=11, out_features=64, num_hidden_units=256).to(device)
-    decoder = Decoder(in_ft=64, out_ft=1, fc_hid_dim=256, cnn_hid_dim=256).to(device)
+    decoder = Decoder(in_ft=128, out_ft=1, fc_hid_dim=256, cnn_hid_dim=256).to(device)
     combined_model = Combine1Loss(stdgi.encoder, linear, decoder)
-    optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= 0.001)
+    optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= args.lr_stdgi)
     
     test_dataloaders = []
     for test_station in args.valid_station:
