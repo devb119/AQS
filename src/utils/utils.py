@@ -87,8 +87,8 @@ lon_min, lon_max = (115.5, 117.25)
 new_resolution = 0.008333
 def find_closest_grid_index(station_lat, station_lon, location="beijing"):
     if location == "beijing":
-        lat_range = np.arange(lat_min, lat_max, new_resolution)
-        lon_range = np.arange(lon_min, lon_max, new_resolution)
+        lat_range = np.arange(lat_min, lat_max, new_resolution)[31:84]
+        lon_range = np.arange(lon_min, lon_max, new_resolution)[82:138]
     elif location == "uk":
         lat_range = np.arange(50.0, 58.5, 0.05)  
         lon_range = np.arange(-7.5, 1.875, 0.05) 

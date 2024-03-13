@@ -11,7 +11,7 @@ class AQDataset(Dataset):
         data_df,
         climate_df,
         location_df,
-        input_len,
+        seq_len,
         merra_scaler,
         era_scaler,
         test=False,
@@ -38,7 +38,7 @@ class AQDataset(Dataset):
         self.dataset = args.dataset
         self.satellite_in_features = args.satellite_in_features
         
-        self.input_len = input_len
+        self.seq_len = seq_len
         self.test = test
         self.valid = valid
         self.data_df = data_df
@@ -118,7 +118,7 @@ class AQDataset(Dataset):
             adjacency_matrix.append(reverse_dis / reverse_dis.sum())
         adjacency_matrix = np.array(adjacency_matrix)
         adjacency_matrix = np.expand_dims(adjacency_matrix, 0)
-        adjacency_matrix = np.repeat(adjacency_matrix, self.input_len, 0)
+        adjacency_matrix = np.repeat(adjacency_matrix, self.seq_len, 0)
         return adjacency_matrix
     
     def init_position(self):
@@ -132,24 +132,31 @@ class AQDataset(Dataset):
     
     # [lat, lon, 'AOD', 'black_carbon', 'dust', 'organic_carbon', 'sea_salt', 'sulfate']
     def load_merra(self, index):
+        # Get real index in timestep
         if self.test:
             dataset_index = self.X_satellite_test[index]
         elif self.valid:
             dataset_index = self.X_satellite_valid[index]
         else:
             dataset_index = self.X_satellite_train[index]
-        date_obj = get_date_from_index(dataset_index)
-        filename = date_obj.strftime("%Y-%m-%d.%H:30:00.npy")
-        arr = np.load(self.data_dir + filename)
+        # Get seq_len timestep of satellite data
+        data_list = []
+        for i in range(0, self.seq_len):
+            date_obj = get_date_from_index(dataset_index + i)
+            filename = date_obj.strftime("%Y-%m-%d.%H:30:00.npy")
+            timestep = np.load(self.data_dir + filename)
+            data_list.append(timestep)
+        arr = np.stack(data_list, axis=0)
+        # Scale data
         for i in range(2, 8):
             min_val = self.merra_scaler['min'][i - 2]
             max_val = self.merra_scaler['max'][i - 2]
-            arr[i, :, :] = ((arr[i, :, :] - min_val) * (1 - (-1)) / (max_val - min_val)) + (-1)
+            arr[:, i, :, :] = ((arr[:, i, :, :] - min_val) * (1 - (-1)) / (max_val - min_val)) + (-1)
         # Remove one variable along the first dimension for feature selection
         # Keep first 2 vars (lat, lon), skip AOD, keep the remainings
         # new_arr = np.concatenate((arr[:6], arr[7:]), axis=0)
         # new_arr = arr[:7]
-        return arr
+        return arr # (seq_len, 8, 151, 211)
     
     # ['lat', 'lon', '10 metre U wind component', '10 metre V wind component', '2 metre temperature', 'Boundary layer height', 'Surface pressure']
     def load_era5(self, index):
@@ -159,16 +166,22 @@ class AQDataset(Dataset):
             dataset_index = self.X_satellite_valid[index]
         else:
             dataset_index = self.X_satellite_train[index]
-        date_obj = get_date_from_index(dataset_index)
-        filename = date_obj.strftime("%Y_%m_%d_%H_00_00.npy")
-        arr = np.load(self.era5_dir + filename)
+        # Get seq_len timestep of satellite data
+        data_list = []
+        for i in range(0, self.seq_len):
+            date_obj = get_date_from_index(dataset_index + i)
+            filename = date_obj.strftime("%Y_%m_%d_%H_00_00.npy")
+            timestep = np.load(self.era5_dir + filename)
+            data_list.append(timestep)
+        arr = np.stack(data_list, axis=0)
+        
         for i in range(2, 7):
             min_val = self.era_scaler['min'][i - 2]
             max_val = self.era_scaler['max'][i - 2]
-            arr[i, :, :] = ((arr[i, :, :] - min_val) * (1 - (-1)) / (max_val - min_val)) + (-1)
+            arr[:, i, :, :] = ((arr[:, i, :, :] - min_val) * (1 - (-1)) / (max_val - min_val)) + (-1)
         # new_arr = np.concatenate((arr[:5], arr[6:]), axis=0)
-        new_arr = arr[:6]
-        return new_arr
+        # new_arr = arr[:6]
+        return arr # (seq_len, 7, 151, 211)
 
     def convert_data_to_Cartesian(self, arr):
         new_arr = np.expand_dims(arr,1)
@@ -181,12 +194,12 @@ class AQDataset(Dataset):
     def __getitem__(self,index: int):
         merra = self.load_merra(index)
         era = self.load_era5(index)
-        concat_data = np.concatenate((merra, era[2:,:,:]), axis=0)
-        
+        concat_data = np.concatenate((merra, era[:, 2:, :, :]), axis=1)
+        # import pdb; pdb.set_trace()
         list_G = []
         if self.test or self.valid:
-            x = self.X[index : index + self.input_len, :]  
-            y = self.Y_test[index + self.input_len - 1]  # float
+            x = self.X[index : index + self.seq_len, :]
+            y = self.Y_test[index + self.seq_len - 1]  # float
             G = self.G_test #shape [12,5,5]
             l = self.l_test # shape (5,)
             lat_index, lon_index = find_closest_grid_index(self.location[self.test_station][0], self.location[self.test_station][1])
@@ -198,12 +211,12 @@ class AQDataset(Dataset):
             list_selected_train_station = list(
                 set(self.train_station) - set([picked_target_station_int])
             )
-            x = self.X_train[index : index + self.input_len, list_selected_train_station, :]
+            x = self.X_train[index : index + self.seq_len, list_selected_train_station, :]
             
-            y = self.X_train[index + self.input_len - 1, picked_target_station_int, 0]
+            y = self.X_train[index + self.seq_len - 1, picked_target_station_int, 0]
             
             # climate = self.climate_train[
-            #     index + self.input_len - 1, picked_target_station_int, :
+            #     index + self.seq_len - 1, picked_target_station_int, :
             # ]
             G = self.get_adjacency_matrix(
                 list_selected_train_station, picked_target_station_int
@@ -216,7 +229,7 @@ class AQDataset(Dataset):
             "X": x,
             "merra": merra,
             "era": era,
-            "X_satellite": concat_data,
+            "X_satellite": concat_data, # (seq_len, 13, 151, 211)
             "Y": np.array([y]),
             "l": np.array(l),
             "climate": 1,
@@ -230,9 +243,9 @@ class AQDataset(Dataset):
     def __len__(self,):
         if self.test:
             
-            return len(self.X_satellite_test) - self.input_len
+            return len(self.X_satellite_test) - self.seq_len
         if self.valid:
-            return len(self.X_satellite_valid) - self.input_len
+            return len(self.X_satellite_valid) - self.seq_len
         else:
             # return 18532
-            return len(self.X_satellite_train) - self.input_len
+            return len(self.X_satellite_train) - self.seq_len

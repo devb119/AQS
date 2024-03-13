@@ -59,8 +59,8 @@ def get_options():
         args.input_dim = 7
         args.num_input_station = 5
     elif args.dataset == "beijing":
-        args.data_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/merra-2-idw/"
-        args.era5_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/era5_extracted/merged_idw/"
+        args.data_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/crop/merra/"
+        args.era5_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/crop/era/"
         args.data_path = "/mnt/disk2/ducanh/AQInterpolation/station_data/beijing/"
         args.train_station = [0,1,2,3,4]
         args.valid_station = [5,6,7]

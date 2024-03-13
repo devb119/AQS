@@ -122,9 +122,9 @@ def train_1_loss(combined_model, dataloader, test_dataloaders, optimizer, device
     epoch_loss = 0
     for data in tqdm(dataloader):
         if not early_stopping.early_stop:
-            x, G, l, cnn_x, y = data['X'].to(torch.float32).to(device), data['G'].to(torch.float32).to(device), data['l'].to(torch.float32).to(device), data['X_satellite'].to(device), data['Y'].to(torch.float32).to(device)
+            x, G, l, x_satellite, y = data['X'].to(torch.float32).to(device), data['G'].to(torch.float32).to(device), data['l'].to(torch.float32).to(device), data['X_satellite'].to(device), data['Y'].to(torch.float32).to(device)
             lat_index, lon_index = data['lat_lon']
-            data = (x,G,l, cnn_x, lat_index, lon_index, y)
+            data = (x,G,l, x_satellite, lat_index, lon_index, y)
             loss = combined_model.get_loss(data)
             optimizer.zero_grad()
             loss.backward()

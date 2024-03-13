@@ -1,8 +1,9 @@
 from src.utils.data_loader import AQDataset
-from src.models.linear import LinearModel
+from src.models.linear import AttentionEncoder
 from src.models.stdgi import Attention_STDGI
 from src.models.combine_1_loss import Combine1Loss
 from src.models.decoder import Decoder
+from src.models.dot_prod_atten import ScaledDotProductAttention
 from src.utils.args import get_options
 from torch.utils.data import DataLoader
 from src.utils.utils import *
@@ -73,7 +74,7 @@ if __name__ == '__main__':
     )
     
     train_dataloader = DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=8
+        train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4
     )
     
     if not os.path.exists(f"output/{args.group_name}/checkpoint/"):
@@ -118,19 +119,20 @@ if __name__ == '__main__':
     # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
     
     # Training with decoder
-    linear = LinearModel(in_features=args.satellite_in_features, out_features=64, num_hidden_units=256).to(device)
+    feature_linear = AttentionEncoder(in_features=12, out_features=64, num_hidden_units=256, query_dim=64, atten_mode="feature").to(device)
+    temporal_linear = AttentionEncoder(in_features=args.satellite_in_features, out_features=64, num_hidden_units=256, query_dim=64, atten_mode="temporal").to(device)
     decoder = Decoder(in_ft=128, out_ft=1, fc_hid_dim=256, cnn_hid_dim=256).to(device)
-    combined_model = Combine1Loss(stdgi.encoder, linear, decoder)
-    optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= 0.001)
+    combined_model = Combine1Loss(stdgi.encoder, feature_linear, temporal_linear, decoder)
+    optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= args.lr_stdgi)
     
     test_dataloaders = []
     for test_station in args.valid_station:
-        test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, input_len=12,
+        test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, seq_len=12,
                                     valid=True,test=False,args=args,test_station=test_station,
                                     merra_scaler=merra_dict,
                                     era_scaler=era_dict)
         test_dataloader = DataLoader(
-                test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=8
+                test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4
             )
         test_dataloaders.append(test_dataloader)
         
@@ -168,13 +170,13 @@ if __name__ == '__main__':
     
     print("Start testing")
     for test_station in args.test_station:
-        test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, input_len=12,
+        test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, seq_len=12,
                                     valid=False,test=True,args=args,test_station=test_station,
                                     merra_scaler=merra_dict,
                                     era_scaler=era_dict)
 
         test_dataloader = DataLoader(
-            test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=8
+            test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4
         )
         testing_loss, list_prd, list_grt = test_1_loss(combined_model, test_dataloader, device, scaler)
         output_arr = np.concatenate(
