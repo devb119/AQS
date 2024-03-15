@@ -16,6 +16,7 @@ def get_options():
     parser.add_argument("--output_stdgi", type=int, default= 64)
     parser.add_argument("--en_hid1", type=int, default=64)
     parser.add_argument("--en_hid2", type=int,default=64)
+    parser.add_argument("--decoder_hid", type=int,default=256)
     parser.add_argument("--dis_hid", type=int, default=64)
     parser.add_argument("--stdgi_noise_min", type=float, default=0.4)
     parser.add_argument("--stdgi_noise_max", type=float, default=0.7)

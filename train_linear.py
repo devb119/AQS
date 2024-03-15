@@ -3,7 +3,6 @@ from src.models.linear import AttentionEncoder
 from src.models.stdgi import Attention_STDGI
 from src.models.combine_1_loss import Combine1Loss
 from src.models.decoder import Decoder
-from src.models.dot_prod_atten import ScaledDotProductAttention
 from src.utils.args import get_options
 from torch.utils.data import DataLoader
 from src.utils.utils import *
@@ -119,11 +118,12 @@ if __name__ == '__main__':
     # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
     
     # Training with decoder
-    feature_linear = AttentionEncoder(in_features=12, out_features=64, num_hidden_units=256, query_dim=64, atten_mode="feature").to(device)
-    temporal_linear = AttentionEncoder(in_features=args.satellite_in_features, out_features=64, num_hidden_units=256, query_dim=64, atten_mode="temporal").to(device)
-    decoder = Decoder(in_ft=128, out_ft=1, fc_hid_dim=256, cnn_hid_dim=256).to(device)
+    feature_linear = AttentionEncoder(in_features=12, out_features=64, num_hidden_units=256, query_dim=11, atten_mode="feature").to(device)
+    temporal_linear = AttentionEncoder(in_features=args.satellite_in_features, out_features=64, num_hidden_units=256, query_dim=11, atten_mode="temporal").to(device)
+    decoder = Decoder(in_ft=192, out_ft=1, fc_hid_dim=args.decoder_hid, cnn_hid_dim=args.decoder_hid).to(device)
     combined_model = Combine1Loss(stdgi.encoder, feature_linear, temporal_linear, decoder)
     optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= args.lr_stdgi)
+    # schedular = torch.optim.lr_scheduler.StepLR(optimizer_combined_model, step_size=1)
     
     test_dataloaders = []
     for test_station in args.valid_station:
@@ -159,6 +159,7 @@ if __name__ == '__main__':
                                                         early_stopping_decoder, 
                                                         scaler,
                                                         iteration_counter)
+            # schedular.step()
             
         if args.use_wandb:
             wandb.log({"epoch_loss": training_loss})

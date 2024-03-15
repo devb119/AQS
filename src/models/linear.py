@@ -63,6 +63,7 @@ class AttentionEncoder(nn.Module):
         
         self.fc1 = nn.Linear(num_hidden_units, num_hidden_units)
         self.fc2 = nn.Linear(num_hidden_units, out_features)
+        # self.relu = nn.LeakyReLU(negative_slope=0.1)
         self.relu = nn.ReLU()
         self.attn = ScaledDotProductAttention(num_hidden_units)
 

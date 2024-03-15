@@ -29,13 +29,15 @@ class Combine1Loss(nn.Module):
     def forward(self, data):
         x, G, l, x_satellite, lat_index, lon_index, y = data
         # satellite_representation = self.get_satellite_representation(x_satellite, lat_index, lon_index)
-        # x_satellite [batch_size, timestep, feature, width, height]
         gnn_representation = self.get_idw_representation(x,G,l)
         # Temporal attention
-        # satellite_representation = self.temporal_encoder(x_satellite[:, :, 2:, lat_index[0], lon_index[0]].to(torch.float32), gnn_representation).squeeze() # [batch_size, timestep, hidden]
+        # x_satellite [batch_size, timestep, feature, width, height]
+        satellite_representation_t = self.temporal_encoder(x_satellite[:, :, 2:, lat_index[0], lon_index[0]].to(torch.float32), x_satellite[:, -1,2:, lat_index[0], lon_index[0]].unsqueeze(dim=1).to(torch.float32)).squeeze() # [batch_size, timestep, hidden]
         # Feature attention
-        satellite_representation = self.feature_encoder(x_satellite[:, :, 2:, lat_index[0], lon_index[0]].to(torch.float32), gnn_representation).squeeze() # [batch_size, timestep, hidden]
-        # import pdb;pdb.set_trace()
+        satellite_representation_f = self.feature_encoder(x_satellite[:, :, 2:, lat_index[0], lon_index[0]].to(torch.float32), 
+                                                            x_satellite[:, -1,2:, lat_index[0], lon_index[0]].unsqueeze(dim=1).to(torch.float32)).squeeze() # [batch_size, timestep, hidden]
+        
+        satellite_representation = torch.concat((satellite_representation_t, satellite_representation_f), dim=1)
         embedded_y = torch.cat((satellite_representation, gnn_representation.squeeze()), dim=1) # (batch_size, 128)
         # GNN only
         # y_pred = self.decoder(gnn_representation)
