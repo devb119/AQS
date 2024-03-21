@@ -1,5 +1,6 @@
 from src.utils.data_loader import AQDataset
 from src.models.linear import AttentionEncoder
+from src.models.fcn import FCN
 from src.models.stdgi import Attention_STDGI
 from src.models.combine_1_loss import Combine1Loss
 from src.models.decoder import Decoder
@@ -11,6 +12,7 @@ from src.utils.early_stopping import EarlyStopping
 from src.utils.train_func import *
 from src.utils.counter import Counter
 from src.utils.test_func import test_1_loss, cal_acc
+from time import time
 
 import matplotlib.pyplot as plt
 import json
@@ -99,9 +101,12 @@ if __name__ == '__main__':
     
     # import pdb; pdb.set_trace()
     ###### Train STDGI to get GCN ##########
+    start_stdgi = time()
     stdgi.train()
     for i in range(args.num_epochs_stdgi):
-            loss = train_atten_stdgi(
+        if early_stopping_stdgi.early_stop:
+            break
+        loss = train_atten_stdgi(
                     stdgi,
                     train_dataloader,
                     stdgi_optimizer_e,
@@ -114,14 +119,24 @@ if __name__ == '__main__':
                     args = args
                 )
     ## Load  best stdgi model
-    load_model(stdgi, f"/mnt/disk2/ducanh/gap_filling/output/ver1_beijing/checkpoint/stdgi_gap_filling.pt")
-    # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
+    # load_model(stdgi, f"/mnt/disk2/ducanh/gap_filling/output/ver1_beijing/checkpoint/stdgi_gap_filling.pt")
+    end_stdgi = time()
+    # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name[:-4]}.pt")
+    load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
+    print(f"Stdgi training time: {end_stdgi - start_stdgi} seconds")
     
     # Training with decoder
     feature_linear = AttentionEncoder(in_features=12, out_features=64, num_hidden_units=256, query_dim=11, atten_mode="feature").to(device)
     temporal_linear = AttentionEncoder(in_features=args.satellite_in_features, out_features=64, num_hidden_units=256, query_dim=11, atten_mode="temporal").to(device)
-    decoder = Decoder(in_ft=192, out_ft=1, fc_hid_dim=args.decoder_hid, cnn_hid_dim=args.decoder_hid).to(device)
-    combined_model = Combine1Loss(stdgi.encoder, feature_linear, temporal_linear, decoder)
+    fcn = FCN(in_features=args.satellite_in_features, out_features=64, num_hidden_units=256).to(device)
+    if args.satellite_handler == "fcn" or args.satellite_handler == "temporal_att" or args.satellite_handler == "temporal_att":
+        decoder_in_ft = 128
+    elif args.satellite_handler == "gnn":
+        decoder_in_ft = 64
+    elif args.satellite_handler == "concat":
+        decoder_in_ft = 192
+    decoder = Decoder(in_ft=decoder_in_ft, out_ft=1, fc_hid_dim=args.decoder_hid, cnn_hid_dim=args.decoder_hid).to(device)
+    combined_model = Combine1Loss(stdgi.encoder, feature_linear, temporal_linear, fcn, decoder, args.satellite_handler)
     optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= args.lr_stdgi)
     # schedular = torch.optim.lr_scheduler.StepLR(optimizer_combined_model, step_size=1)
     
@@ -147,7 +162,7 @@ if __name__ == '__main__':
     iteration_counter = Counter()
     # Load pretrained L2
     # load_model(combined_model, 'output/ver1_beijing/checkpoint/decoder_train_L2.pt')
-    
+    start_combine = time()
     for ep in range(args.decoder_epochs):
         if not early_stopping_decoder.early_stop:
             training_loss = train_1_loss(combined_model, 
@@ -163,13 +178,15 @@ if __name__ == '__main__':
             
         if args.use_wandb:
             wandb.log({"epoch_loss": training_loss})
-    
+    end_combine = time()
+    print(f"main model training time: {end_combine - start_combine} seconds")
     load_model(combined_model, f"output/{args.group_name}/checkpoint/decoder_{args.name}.pt")
     # test
     list_acc = []
     predict = {}
     
     print("Start testing")
+    start_test = time()
     for test_station in args.test_station:
         test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, seq_len=12,
                                     valid=False,test=True,args=args,test_station=test_station,
@@ -195,7 +212,8 @@ if __name__ == '__main__':
         predict[test_station] = {"grt": list_grt, "prd": list_prd}
         print("Test Accuracy: {}".format(mae, mse, corr))
 
-    
+    end_test = time()
+    print(f"Test time: {end_test - start_test} seconds")
     for test_station in args.test_station:
         df = pd.DataFrame(data=predict[test_station], columns=["grt", "prd"])
         if args.use_wandb:
@@ -207,7 +225,7 @@ if __name__ == '__main__':
         columns=["STATION", "MAE", "MSE", "MAPE", "MDAPE", "RMSE", "R2", "CORR"],
     )
     # saved_log = "_".join(args.features)
-    saved_log = "satellite_feature_selection"
+    saved_log = args.group_name
     import os
     if not os.path.exists(f"log_infor/{saved_log}"):
         os.makedirs(f"log_infor/{saved_log}")
@@ -232,25 +250,3 @@ if __name__ == '__main__':
             wandb.log({"Tram_{}_pred_gt".format(test_station): df_stat})
     if args.use_wandb:
         wandb.finish()
-    # print("Total time: ", time.time() - t_t)
-    # optimizer = torch.optim.Adam(linear.parameters(), lr=0.001)
-    # loss_fn = nn.MSELoss()
-
-    # linear.train()
-    # for i in range(args.num_epochs_linear):
-    #     count = 0
-    #     iteration_loss = 0
-    #     for data in tqdm(train_dataloader):
-    #         y_pred = linear(data['merra'])
-    #         loss = loss_fn(y_pred, y)
-            
-    #         optimizer.zero_grad()
-    #         loss.backward()
-    #         optimizer.step()
-            
-    #         iteration_loss += loss.item()
-            
-    #         if count % args.n_iterations == 0:
-    #             print(iteration_loss / args.n_iterations)
-    #             if args.use_wandb:
-    #                 pass

@@ -1,5 +1,6 @@
 import argparse
 
+
 def get_options():
     parser = argparse.ArgumentParser()
     
@@ -20,13 +21,14 @@ def get_options():
     parser.add_argument("--dis_hid", type=int, default=64)
     parser.add_argument("--stdgi_noise_min", type=float, default=0.4)
     parser.add_argument("--stdgi_noise_max", type=float, default=0.7)
-    
-    ## CNN architecture
-    parser.add_argument("--satellite_in_features", type=int, default= 11)
-    parser.add_argument("--decoder_epochs", type=int, default = 50)
-    parser.add_argument("--cnn_model", type=str, default= "cnn", choices=["alexnet", "cnn"])
-    
-    #Wandb config
+
+    # CNN architecture
+    parser.add_argument("--satellite_in_features", type=int, default=11)
+    parser.add_argument("--decoder_epochs", type=int, default=50)
+    parser.add_argument("--satellite_handler", type=str, default="fcn",
+                        choices=["temporal_att", "feature_att", "concat", "gnn", "fcn"])
+
+    # Wandb config
     parser.add_argument("--group_name", type=str, default="Test group")
     parser.add_argument("--use_wandb", action="store_true", default=False)
     parser.add_argument("--name", type=str, default= "Test")
