@@ -99,21 +99,23 @@ if __name__ == '__main__':
     ###### Train STDGI to get GCN ##########
     stdgi.train()
     for i in range(args.num_epochs_stdgi):
-            loss = train_atten_stdgi(
-                    stdgi,
-                    train_dataloader,
-                    stdgi_optimizer_e,
-                    stdgi_optimizer_d,
-                    bce_loss,
-                    device,
-                    n_steps=2,
-                    n_iterations = 50,
-                    early_stopping_stdgi = early_stopping_stdgi,
-                    args = args
-                )
+        if early_stopping_stdgi.early_stop:
+            break
+        loss = train_atten_stdgi(
+                stdgi,
+                train_dataloader,
+                stdgi_optimizer_e,
+                stdgi_optimizer_d,
+                bce_loss,
+                device,
+                n_steps=2,
+                n_iterations = 50,
+                early_stopping_stdgi = early_stopping_stdgi,
+                args = args
+            )
     ## Load  best stdgi model
-    load_model(stdgi, f"/mnt/disk2/ducanh/gap_filling/output/ver1_beijing/checkpoint/stdgi_gap_filling.pt")
-    # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
+    # load_model(stdgi, f"/mnt/disk2/ducanh/gap_filling/output/ver1_beijing/checkpoint/stdgi_gap_filling.pt")
+    load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
     
     # Training with decoder
     linear = LinearModel(in_features=11, out_features=64, num_hidden_units=256).to(device)
