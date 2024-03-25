@@ -34,10 +34,10 @@ class Combine1Loss(nn.Module):
         # import pdb; pdb.set_trace()
         embedded_y = torch.cat((cnn_representation, gnn_representation.squeeze()), dim=1) # (batch_size, 128)
         # GNN only
-        # y_pred = self.decoder(gnn_representation)
+        y_pred = self.decoder(gnn_representation)
         # GNN station data + satellite data
-        y_pred = self.decoder(embedded_y)
+        # y_pred = self.decoder(embedded_y)
         # GNN only
-        # return y_pred.reshape(y.shape)
+        return y_pred.reshape(y.shape)
         # GNN station data + satellite data
-        return y_pred
+        # return y_pred
