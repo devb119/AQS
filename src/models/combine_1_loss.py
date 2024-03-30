@@ -38,7 +38,7 @@ class Combine1Loss(nn.Module):
                                                             x_satellite[:, -1,2:, lat_index[0], lon_index[0]].unsqueeze(dim=1).to(torch.float32)).squeeze() # [batch_size, timestep, hidden]
         
         satellite_representation = torch.concat((satellite_representation_t, satellite_representation_f), dim=1)
-        embedded_y = torch.cat((satellite_representation, gnn_representation.squeeze()), dim=1) # (batch_size, 128)
+        embedded_y = torch.cat((satellite_representation_t, gnn_representation.squeeze()), dim=1) # (batch_size, 128)
         # GNN only
         # y_pred = self.decoder(gnn_representation)
         # GNN only

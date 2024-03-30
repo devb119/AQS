@@ -114,13 +114,13 @@ if __name__ == '__main__':
                     args = args
                 )
     ## Load  best stdgi model
-    load_model(stdgi, f"/mnt/disk2/ducanh/gap_filling/output/ver1_beijing/checkpoint/stdgi_gap_filling.pt")
-    # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
+    # load_model(stdgi, f"/mnt/disk2/ducanh/gap_filling/output/ver1_beijing/checkpoint/stdgi_gap_filling.pt")
+    load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
     
     # Training with decoder
     feature_linear = AttentionEncoder(in_features=12, out_features=64, num_hidden_units=256, query_dim=11, atten_mode="feature").to(device)
     temporal_linear = AttentionEncoder(in_features=args.satellite_in_features, out_features=64, num_hidden_units=256, query_dim=11, atten_mode="temporal").to(device)
-    decoder = Decoder(in_ft=192, out_ft=1, fc_hid_dim=args.decoder_hid, cnn_hid_dim=args.decoder_hid).to(device)
+    decoder = Decoder(in_ft=128, out_ft=1, fc_hid_dim=args.decoder_hid, cnn_hid_dim=args.decoder_hid).to(device)
     combined_model = Combine1Loss(stdgi.encoder, feature_linear, temporal_linear, decoder)
     optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= args.lr_stdgi)
     # schedular = torch.optim.lr_scheduler.StepLR(optimizer_combined_model, step_size=1)
