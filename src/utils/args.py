@@ -24,7 +24,7 @@ def get_options():
     ## CNN architecture
     parser.add_argument("--satellite_in_features", type=int, default= 11)
     parser.add_argument("--decoder_epochs", type=int, default = 50)
-    parser.add_argument("--cnn_model", type=str, default= "cnn", choices=["alexnet", "cnn"])
+    parser.add_argument("--satellite_handler", type=str, default="temporal_att", choices=["temporal_att", "feature_att", "concat", "gnn"])
     
     #Wandb config
     parser.add_argument("--group_name", type=str, default="Test group")
