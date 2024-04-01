@@ -63,9 +63,9 @@ def get_options():
         args.data_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/crop/merra/"
         args.era5_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/crop/era/"
         args.data_path = "/mnt/disk2/ducanh/AQInterpolation/station_data/beijing/"
-        args.train_station = [0,1,2,3,4]
-        args.valid_station = [5,6,7]
-        args.test_station = [8,9,10,11]
+        args.train_station = [0,1,3,7,10]
+        args.valid_station = [2,6,8]
+        args.test_station = [4,5,9,11]
         
         # args.features = ["PM2.5","PM10","SO2","NO2","CO", "O3","PRES", "RAIN", "TEMP","WSPM", 'black_carbon', 'dust', 'organic_carbon', 'SO2', 'sea_salt', 'AOD']
         args.features = ["PM2.5","PM10","SO2","NO2","CO", "O3","PRES", "RAIN", "TEMP","WSPM", "DEWP"]
