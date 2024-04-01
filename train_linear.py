@@ -115,12 +115,12 @@ if __name__ == '__main__':
                 )
     ## Load  best stdgi model
     # load_model(stdgi, f"/mnt/disk2/ducanh/AQS/output/reproduce/checkpoint/stdgi_temporal.pt")
-    load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
-    # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name[:-4]}.pt")
+    # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
+    load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name[:-4]}.pt")
     
     # Training with decoder
-    feature_linear = AttentionEncoder(in_features=12, out_features=64, num_hidden_units=256, query_dim=11, atten_mode="feature").to(device)
-    temporal_linear = AttentionEncoder(in_features=args.satellite_in_features, out_features=64, num_hidden_units=256, query_dim=11, atten_mode="temporal").to(device)
+    feature_linear = AttentionEncoder(in_features=12, out_features=64, num_hidden_units=args.satellite_hid, query_dim=11, atten_mode="feature").to(device)
+    temporal_linear = AttentionEncoder(in_features=args.satellite_in_features, out_features=64, num_hidden_units=args.satellite_hid, query_dim=11, atten_mode="temporal").to(device)
     if args.satellite_handler == "temporal_att" or args.satellite_handler == "feature_temporal":
         decoder_in_ft = 128
     elif args.satellite_handler == "gnn":

@@ -21,8 +21,9 @@ def get_options():
     parser.add_argument("--stdgi_noise_min", type=float, default=0.4)
     parser.add_argument("--stdgi_noise_max", type=float, default=0.7)
     
-    ## CNN architecture
+    ## Satellite architecture
     parser.add_argument("--satellite_in_features", type=int, default= 11)
+    parser.add_argument("--satellite_hid", type=int, default= 256)
     parser.add_argument("--decoder_epochs", type=int, default = 50)
     parser.add_argument("--satellite_handler", type=str, default="temporal_att", choices=["temporal_att", "feature_att", "concat", "gnn"])
     

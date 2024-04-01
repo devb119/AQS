@@ -2,10 +2,11 @@ CUDA_VISIBLE_DEVICES=0 python train_linear.py \
 --dataset "beijing" \
 --group_name station_swap \
 --satellite_in_features 11 \
---num_epochs_stdgi 50 \
+--satellite_hid 256 \
+--num_epochs_stdgi 0 \
 --decoder_epochs 50 \
 --n_iterations 300 \
---satellite_handler temporal_att \
---name "temporal_0_1_3_7_10" \
+--satellite_handler gnn \
+--name "temporal_0_1_3_7_10_gnn" \
 --lr_stdgi 0.001 \
 --use_wandb
