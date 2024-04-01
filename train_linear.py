@@ -207,7 +207,7 @@ if __name__ == '__main__':
         columns=["STATION", "MAE", "MSE", "MAPE", "MDAPE", "RMSE", "R2", "CORR"],
     )
     # saved_log = "_".join(args.features)
-    saved_log = "satellite_feature_selection"
+    saved_log = args.group_name
     import os
     if not os.path.exists(f"log_infor/{saved_log}"):
         os.makedirs(f"log_infor/{saved_log}")
