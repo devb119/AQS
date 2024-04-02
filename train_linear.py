@@ -114,9 +114,9 @@ if __name__ == '__main__':
                     args = args
                 )
     ## Load  best stdgi model
-    # load_model(stdgi, f"/mnt/disk2/ducanh/AQS/output/reproduce/checkpoint/stdgi_temporal.pt")
+    load_model(stdgi, f"/mnt/disk2/ducanh/AQS/output/station_swap/checkpoint/stdgi_temporal_0_1_2_3_4.pt")
     # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
-    load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name[:-4]}.pt")
+    # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name[:-4]}.pt")
     
     # Training with decoder
     feature_linear = AttentionEncoder(in_features=12, out_features=64, num_hidden_units=args.satellite_hid, query_dim=11, atten_mode="feature").to(device)
