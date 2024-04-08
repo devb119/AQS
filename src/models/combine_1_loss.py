@@ -2,12 +2,14 @@ import torch
 import torch.nn as nn
 
 class Combine1Loss(nn.Module):
+    # def __init__(self,gcn_encoder, srcnn, feature_encoder, temporal_encoder, decoder, satellite_handler):
     def __init__(self,gcn_encoder, feature_encoder, temporal_encoder, decoder, satellite_handler):
         super().__init__()
         self.gnn_encoder = gcn_encoder
         self.feature_encoder = feature_encoder
         self.temporal_encoder = temporal_encoder
         self.decoder = decoder
+        # self.srcnn = srcnn
         self.satellite_handler = satellite_handler
         self.mse_loss = nn.MSELoss()
     
@@ -31,6 +33,9 @@ class Combine1Loss(nn.Module):
         x, G, l, x_satellite, lat_index, lon_index, y = data
         # satellite_representation = self.get_satellite_representation(x_satellite, lat_index, lon_index)
         gnn_representation = self.get_idw_representation(x,G,l)
+        # for i in range(12):
+        #     x_satellite[:, i, 2:, :, :] = self.srcnn(x_satellite[:, i, 2:, :, :].to(torch.float32))
+        
         # Temporal attention
         if self.satellite_handler == "temporal_att":
         # x_satellite [batch_size, timestep, feature, width, height]

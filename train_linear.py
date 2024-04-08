@@ -2,6 +2,7 @@ from src.utils.data_loader import AQDataset
 from src.models.linear import AttentionEncoder
 from src.models.stdgi import Attention_STDGI
 from src.models.combine_1_loss import Combine1Loss
+from src.models.SRCNN import SRCNN
 from src.models.decoder import Decoder
 from src.utils.args import get_options
 from torch.utils.data import DataLoader
@@ -46,7 +47,7 @@ if __name__ == '__main__':
     # Scale into (-1,1)
     data_arr, climate_arr, scaler = preprocess_pipeline(list_arr, args)
     
-    train_dataset = AQDataset(data_arr, climate_arr, location_, 12, merra_dict, era_dict, args=args)
+    train_dataset = AQDataset(data_arr, climate_arr, location_, args.seq_len, merra_dict, era_dict, args=args)
     
     # import pdb; pdb.set_trace()
     
@@ -114,7 +115,7 @@ if __name__ == '__main__':
                     args = args
                 )
     ## Load  best stdgi model
-    load_model(stdgi, f"/mnt/disk2/ducanh/AQS/output/station_swap/checkpoint/stdgi_temporal_0_1_2_3_4.pt")
+    load_model(stdgi, f"/mnt/disk2/ducanh/AQS/output/finetune/checkpoint/stdgi_hid512_iter1316_step24.pt")
     # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
     # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name[:-4]}.pt")
     
@@ -127,14 +128,16 @@ if __name__ == '__main__':
         decoder_in_ft = 64
     elif args.satellite_handler == "concat":
         decoder_in_ft = 192
+    # srcnn = SRCNN().to(device)
     decoder = Decoder(in_ft=decoder_in_ft, out_ft=1, fc_hid_dim=args.decoder_hid, cnn_hid_dim=args.decoder_hid).to(device)
+    # combined_model = Combine1Loss(stdgi.encoder, srcnn, feature_linear, temporal_linear, decoder, args.satellite_handler)
     combined_model = Combine1Loss(stdgi.encoder, feature_linear, temporal_linear, decoder, args.satellite_handler)
-    optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= args.lr_stdgi)
+    optimizer_combined_model = torch.optim.Adam(combined_model.parameters(), lr= args.lr_combine)
     # schedular = torch.optim.lr_scheduler.StepLR(optimizer_combined_model, step_size=1)
     
     test_dataloaders = []
     for test_station in args.valid_station:
-        test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, seq_len=12,
+        test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, seq_len=args.seq_len,
                                     valid=True,test=False,args=args,test_station=test_station,
                                     merra_scaler=merra_dict,
                                     era_scaler=era_dict)
@@ -178,7 +181,7 @@ if __name__ == '__main__':
     
     print("Start testing")
     for test_station in args.test_station:
-        test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, seq_len=12,
+        test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, seq_len=args.seq_len,
                                     valid=False,test=True,args=args,test_station=test_station,
                                     merra_scaler=merra_dict,
                                     era_scaler=era_dict)

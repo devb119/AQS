@@ -1,12 +1,14 @@
-CUDA_VISIBLE_DEVICES=0 python train_linear.py \
---dataset "beijing" \
+CUDA_VISIBLE_DEVICES=1 python train_linear.py \
+--dataset "uk" \
 --group_name finetune \
 --satellite_in_features 11 \
---satellite_hid 2048 \
+--seq_len 24 \
+--satellite_hid 512 \
 --num_epochs_stdgi 0 \
 --decoder_epochs 50 \
---n_iterations 600 \
+--n_iterations 1316 \
 --satellite_handler temporal_att \
---name "hid2048_iter600" \
+--name "hid512_iter1316_step24_lr003" \
 --lr_stdgi 0.001 \
+--lr_combine 0.003 \
 --use_wandb
