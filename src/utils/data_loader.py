@@ -131,7 +131,7 @@ class AQDataset(Dataset):
         return np.reshape(position_arr,(-1,3))
     
     # [lat, lon, 'AOD', 'black_carbon', 'dust', 'organic_carbon', 'sea_salt', 'sulfate']
-    def load_merra(self, index):
+    def load_merra(self, index, predict_station):
         # Get real index in timestep
         if self.test:
             dataset_index = self.X_satellite_test[index]
@@ -145,6 +145,8 @@ class AQDataset(Dataset):
             date_obj = get_date_from_index(dataset_index + i)
             filename = date_obj.strftime("%Y-%m-%d.%H:30:00.npy")
             timestep = np.load(self.data_dir + filename)
+            if self.dataset == "uk":
+                timestep = timestep[:, predict_station, :, :]
             data_list.append(timestep)
         arr = np.stack(data_list, axis=0)
         # Scale data
@@ -159,7 +161,7 @@ class AQDataset(Dataset):
         return arr # (seq_len, 8, 151, 211)
     
     # ['lat', 'lon', '10 metre U wind component', '10 metre V wind component', '2 metre temperature', 'Boundary layer height', 'Surface pressure']
-    def load_era5(self, index):
+    def load_era5(self, index, predict_station):
         if self.test:
             dataset_index = self.X_satellite_test[index]
         elif self.valid:
@@ -172,6 +174,8 @@ class AQDataset(Dataset):
             date_obj = get_date_from_index(dataset_index + i)
             filename = date_obj.strftime("%Y_%m_%d_%H_00_00.npy")
             timestep = np.load(self.era5_dir + filename)
+            if self.dataset == "uk":
+                timestep = timestep[:, predict_station, :, :]
             data_list.append(timestep)
         arr = np.stack(data_list, axis=0)
         
@@ -192,22 +196,21 @@ class AQDataset(Dataset):
         
     
     def __getitem__(self,index: int):
-        merra = self.load_merra(index)
-        era = self.load_era5(index)
-        concat_data = np.concatenate((merra, era[:, 2:, :, :]), axis=1)
-        # import pdb; pdb.set_trace()
         list_G = []
         if self.test or self.valid:
             x = self.X[index : index + self.seq_len, :]
             y = self.Y_test[index + self.seq_len - 1]  # float
             G = self.G_test #shape [12,5,5]
             l = self.l_test # shape (5,)
-            lat_index, lon_index = find_closest_grid_index(self.location[self.test_station][0], self.location[self.test_station][1])
+            lat_index, lon_index = find_closest_grid_index(self.location[self.test_station][0], self.location[self.test_station][1], self.dataset)
             list_G = [G]
+            merra = self.load_merra(index, self.test_station)
+            era = self.load_era5(index, self.test_station)
+            concat_data = np.concatenate((merra, era[:, 2:, :, :]), axis=1)
         else:
             # random select a station in list of train station, this station is chosen as target station for training process
             picked_target_station_int = random.choice(self.train_station)
-            lat_index, lon_index = find_closest_grid_index(self.location[picked_target_station_int][0], self.location[picked_target_station_int][1])
+            lat_index, lon_index = find_closest_grid_index(self.location[picked_target_station_int][0], self.location[picked_target_station_int][1], self.dataset)
             list_selected_train_station = list(
                 set(self.train_station) - set([picked_target_station_int])
             )
@@ -225,6 +228,9 @@ class AQDataset(Dataset):
             l = self.get_reverse_distance_matrix(
                 list_selected_train_station, picked_target_station_int
             )
+            merra = self.load_merra(index, picked_target_station_int)
+            era = self.load_era5(index, picked_target_station_int)
+            concat_data = np.concatenate((merra, era[:, 2:, :, :]), axis=1)
         sample = {
             "X": x,
             "merra": merra,

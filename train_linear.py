@@ -12,6 +12,7 @@ from src.utils.early_stopping import EarlyStopping
 from src.utils.train_func import *
 from src.utils.counter import Counter
 from src.utils.test_func import test_1_loss, cal_acc
+from time import time
 
 import matplotlib.pyplot as plt
 import json
@@ -29,10 +30,16 @@ if __name__ == '__main__':
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s :: %(levelname)s :: %(message)s"
     )
-    with open("min_max_merra.json", "r") as f:
-        merra_dict = json.load(f)
-    with open("min_max_era.json", "r") as f:
-        era_dict = json.load(f)
+    if args.dataset == "beijing":
+        with open("min_max_merra.json", "r") as f:
+            merra_dict = json.load(f)
+        with open("min_max_era.json", "r") as f:
+            era_dict = json.load(f)
+    elif args.dataset == "uk":
+        with open("/mnt/disk2/ducanh/gap_filling/src/preprocess/uk_min_max_merra.json", "r") as f:
+            merra_dict = json.load(f)
+        with open("/mnt/disk2/ducanh/gap_filling/src/preprocess/uk_min_max_era.json", "r") as f:
+            era_dict = json.load(f)
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     try:
@@ -100,6 +107,7 @@ if __name__ == '__main__':
     
     # import pdb; pdb.set_trace()
     ###### Train STDGI to get GCN ##########
+    start_stdgi = time()
     stdgi.train()
     for i in range(args.num_epochs_stdgi):
             loss = train_atten_stdgi(
@@ -114,11 +122,13 @@ if __name__ == '__main__':
                     early_stopping_stdgi = early_stopping_stdgi,
                     args = args
                 )
+    end_stdgi = time()
     ## Load  best stdgi model
-    load_model(stdgi, f"/mnt/disk2/ducanh/AQS/output/finetune/checkpoint/stdgi_hid512_iter1316_step24.pt")
+    load_model(stdgi, f"/mnt/disk2/ducanh/AQS/output/uk/checkpoint/stdgi_bound.pt")
     # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
     # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name[:-4]}.pt")
     
+    print(f"Stdgi training time: {end_stdgi - start_stdgi} seconds")
     # Training with decoder
     feature_linear = AttentionEncoder(in_features=12, out_features=64, num_hidden_units=args.satellite_hid, query_dim=11, atten_mode="feature").to(device)
     temporal_linear = AttentionEncoder(in_features=args.satellite_in_features, out_features=64, num_hidden_units=args.satellite_hid, query_dim=11, atten_mode="temporal").to(device)
@@ -148,7 +158,7 @@ if __name__ == '__main__':
         
     print("Start training combine 1 loss model")
     early_stopping_decoder = EarlyStopping(
-        patience=args.patience,
+        patience=3,
         verbose=True,
         delta=args.delta_decoder,
         path=f"output/{args.group_name}/checkpoint/decoder_{args.name}.pt",
@@ -157,7 +167,7 @@ if __name__ == '__main__':
     iteration_counter = Counter()
     # Load pretrained L2
     # load_model(combined_model, 'output/ver1_beijing/checkpoint/decoder_train_L2.pt')
-    
+    start_combine = time()
     for ep in range(args.decoder_epochs):
         if not early_stopping_decoder.early_stop:
             training_loss = train_1_loss(combined_model, 
@@ -173,13 +183,15 @@ if __name__ == '__main__':
             
         if args.use_wandb:
             wandb.log({"epoch_loss": training_loss})
-    
+    end_combine = time()
+    print(f"main model training time: {end_combine - start_combine} seconds")
     load_model(combined_model, f"output/{args.group_name}/checkpoint/decoder_{args.name}.pt")
     # test
     list_acc = []
     predict = {}
     
     print("Start testing")
+    start_test = time()
     for test_station in args.test_station:
         test_dataset  = AQDataset(data_df= data_arr, climate_df=climate_arr, location_df=location_, seq_len=args.seq_len,
                                     valid=False,test=True,args=args,test_station=test_station,
@@ -205,6 +217,8 @@ if __name__ == '__main__':
         predict[test_station] = {"grt": list_grt, "prd": list_prd}
         print("Test Accuracy: {}".format(mae, mse, corr))
 
+    end_test = time()
+    print(f"Test time: {end_test - start_test} seconds")
     
     for test_station in args.test_station:
         df = pd.DataFrame(data=predict[test_station], columns=["grt", "prd"])

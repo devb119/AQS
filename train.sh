@@ -1,14 +1,14 @@
-CUDA_VISIBLE_DEVICES=1 python train_linear.py \
+CUDA_VISIBLE_DEVICES=0 python train_linear.py \
 --dataset "uk" \
---group_name finetune \
+--group_name uk \
 --satellite_in_features 11 \
 --seq_len 24 \
 --satellite_hid 512 \
---num_epochs_stdgi 0 \
+--num_epochs_stdgi 50 \
 --decoder_epochs 50 \
 --n_iterations 1316 \
---satellite_handler temporal_att \
---name "hid512_iter1316_step24_lr003" \
+--satellite_handler gnn \
+--name "bound_gnn2" \
 --lr_stdgi 0.001 \
---lr_combine 0.003 \
+--lr_combine 0.001 \
 --use_wandb

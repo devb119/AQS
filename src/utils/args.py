@@ -52,12 +52,12 @@ def get_options():
     args.session_name = f"Run test"
     
     if args.dataset == "uk":
-        args.data_path = "/mnt/disk2/ducanh/AQInterpolation/station_data/uk/preprocessed"
-        args.data_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/uk/merra"
-        args.era5_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/uk/era/merged_idw"
-        args.train_station = [0,1,2,3,4,5,6,7,8,9]
-        args.valid_station = [10,11,12,13]
-        args.test_station = [14,15,16,17]
+        args.data_path = "/mnt/disk2/ducanh/AQInterpolation/station_data/uk/preprocessed/"
+        args.data_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/uk/crop/merra/"
+        args.era5_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/uk/crop/era/"
+        args.train_station = [3, 6, 10, 11, 12, 13, 15, 17]
+        args.valid_station = [7, 8, 9, 14]
+        args.test_station = [0, 1, 2, 4, 5, 16]
         
         args.features = ["PM2.5","PM10","NO2","O3","TEMP","wd","WSPM"]
         args.idx_climate = 4
