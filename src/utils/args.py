@@ -55,9 +55,9 @@ def get_options():
         args.data_path = "/mnt/disk2/ducanh/AQInterpolation/station_data/uk/preprocessed/"
         args.data_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/uk/crop/merra/"
         args.era5_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/uk/crop/era/"
-        args.train_station = [3, 6, 10, 11, 12, 13, 15, 17]
-        args.valid_station = [7, 8, 9, 14]
-        args.test_station = [0, 1, 2, 4, 5, 16]
+        args.train_station = [0, 1, 3, 4, 5, 6, 10, 11, 16]
+        args.valid_station = [2, 7, 8, 14, 15, 17]
+        args.test_station = [9, 12, 13]
         
         args.features = ["PM2.5","PM10","NO2","O3","TEMP","wd","WSPM"]
         args.idx_climate = 4
@@ -78,6 +78,30 @@ def get_options():
         args.input_dim = len(args.features)
         # args.input_dim = len(args.features) + 8
         args.num_input_station = 5
+    elif args.dataset == "uk_old":
+        args.data_path = "/mnt/disk2/ducanh/AQInterpolation/station_data/uk/old/longnd/uk_AQ/"
+        args.data_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/uk-old/merra/"
+        args.era5_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/uk-old/era/daily/"
+        args.train_station = [15,17,19,21,48,73,96,114,131]
+        args.valid_station = [20,34,56,85]
+        args.test_station = [97, 98, 134, 137]
+        
+        args.features = ["O3","NO2","SO2","NOXasNO2","PM2.5","PM10","2m_temperature","surface_pressure","evaporation","total_precipitation","u10","v10","wind_speed","wind_angle"]
+        args.idx_climate = 4
+        args.input_dim = len(args.features)
+        args.num_input_station = 10
+    elif args.dataset == "india":
+        args.data_path = "/mnt/disk2/ducanh/AQInterpolation/station_data/india/"
+        args.data_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/india/merra/"
+        args.era5_dir = "/mnt/disk2/ducanh/gap_filling/processed_data/india/era/merged_idw/"
+        args.train_station = [13,4,7,3,2,1,0,16,15]
+        args.valid_station = [14,12,11,10]
+        args.test_station = [5,6,8,9]
+        
+        args.features = ["PM2.5","PM10","NO","NO2","NOx","NH3","CO","SO2","O3"]
+        args.idx_climate = 4
+        args.input_dim = len(args.features)
+        args.num_input_station = 10
     else:
         raise("Not correct dataset name")
 

@@ -40,6 +40,16 @@ if __name__ == '__main__':
             merra_dict = json.load(f)
         with open("/mnt/disk2/ducanh/gap_filling/src/preprocess/uk_min_max_era.json", "r") as f:
             era_dict = json.load(f)
+    elif args.dataset == "uk_old":
+        with open("/mnt/disk2/ducanh/gap_filling/uk_old_merra.json", "r") as f:
+            merra_dict = json.load(f)
+        with open("/mnt/disk2/ducanh/gap_filling/uk_old_era.json", "r") as f:
+            era_dict = json.load(f)
+    elif args.dataset == "india":
+        with open("/mnt/disk2/ducanh/gap_filling/india_merra.json", "r") as f:
+            merra_dict = json.load(f)
+        with open("/mnt/disk2/ducanh/gap_filling/india_era.json", "r") as f:
+            era_dict = json.load(f)
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     try:
@@ -124,8 +134,8 @@ if __name__ == '__main__':
                 )
     end_stdgi = time()
     ## Load  best stdgi model
-    load_model(stdgi, f"/mnt/disk2/ducanh/AQS/output/uk/checkpoint/stdgi_bound.pt")
-    # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
+    # load_model(stdgi, f"/mnt/disk2/ducanh/AQS/output/india/checkpoint/stdgi_india_gnn3.pt")
+    load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name}.pt")
     # load_model(stdgi, f"output/{args.group_name}/checkpoint/stdgi_{args.name[:-4]}.pt")
     
     print(f"Stdgi training time: {end_stdgi - start_stdgi} seconds")
@@ -158,7 +168,7 @@ if __name__ == '__main__':
         
     print("Start training combine 1 loss model")
     early_stopping_decoder = EarlyStopping(
-        patience=3,
+        patience=5,
         verbose=True,
         delta=args.delta_decoder,
         path=f"output/{args.group_name}/checkpoint/decoder_{args.name}.pt",
@@ -256,25 +266,3 @@ if __name__ == '__main__':
             wandb.log({"Tram_{}_pred_gt".format(test_station): df_stat})
     if args.use_wandb:
         wandb.finish()
-    # print("Total time: ", time.time() - t_t)
-    # optimizer = torch.optim.Adam(linear.parameters(), lr=0.001)
-    # loss_fn = nn.MSELoss()
-
-    # linear.train()
-    # for i in range(args.num_epochs_linear):
-    #     count = 0
-    #     iteration_loss = 0
-    #     for data in tqdm(train_dataloader):
-    #         y_pred = linear(data['merra'])
-    #         loss = loss_fn(y_pred, y)
-            
-    #         optimizer.zero_grad()
-    #         loss.backward()
-    #         optimizer.step()
-            
-    #         iteration_loss += loss.item()
-            
-    #         if count % args.n_iterations == 0:
-    #             print(iteration_loss / args.n_iterations)
-    #             if args.use_wandb:
-    #                 pass

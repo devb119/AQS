@@ -142,9 +142,15 @@ class AQDataset(Dataset):
         # Get seq_len timestep of satellite data
         data_list = []
         for i in range(0, self.seq_len):
-            date_obj = get_date_from_index(dataset_index + i)
+            date_obj = get_date_from_index(dataset_index + i, self.dataset)
             filename = date_obj.strftime("%Y-%m-%d.%H:30:00.npy")
-            timestep = np.load(self.data_dir + filename)
+            if self.dataset == "uk_old":
+                date_obj = get_date_from_index(dataset_index + i, dataset="daily")
+                timestep = np.load(self.data_dir + date_obj.strftime("%Y-%m-%d.npy"))
+                # Form the same data of hourly
+                timestep = timestep.reshape(timestep.shape + (1,1))[:, predict_station, :, :] # [features, stations, 1, 1]
+            else:
+                timestep = np.load(self.data_dir + filename)
             if self.dataset == "uk":
                 timestep = timestep[:, predict_station, :, :]
             data_list.append(timestep)
@@ -171,9 +177,15 @@ class AQDataset(Dataset):
         # Get seq_len timestep of satellite data
         data_list = []
         for i in range(0, self.seq_len):
-            date_obj = get_date_from_index(dataset_index + i)
+            date_obj = get_date_from_index(dataset_index + i, self.dataset)
             filename = date_obj.strftime("%Y_%m_%d_%H_00_00.npy")
-            timestep = np.load(self.era5_dir + filename)
+            if self.dataset == "uk_old":
+                date_obj = get_date_from_index(dataset_index + i, dataset="daily")
+                timestep = np.load(self.era5_dir + date_obj.strftime("%Y_%m_%d.npy"))
+                # Form the same data of hourly
+                timestep = timestep.reshape(timestep.shape + (1,1))[:, predict_station, :, :] # [features, stations, 1, 1]
+            else:
+                timestep = np.load(self.era5_dir + filename)
             if self.dataset == "uk":
                 timestep = timestep[:, predict_station, :, :]
             data_list.append(timestep)

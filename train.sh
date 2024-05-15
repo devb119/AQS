@@ -1,14 +1,14 @@
-CUDA_VISIBLE_DEVICES=0 python train_linear.py \
---dataset "uk" \
---group_name uk \
+CUDA_VISIBLE_DEVICES=1 python train_linear.py \
+--dataset "india" \
+--group_name delhi_finetune \
 --satellite_in_features 11 \
 --seq_len 24 \
---satellite_hid 512 \
+--satellite_hid 256 \
 --num_epochs_stdgi 50 \
 --decoder_epochs 50 \
---n_iterations 1316 \
---satellite_handler gnn \
---name "bound_gnn2" \
---lr_stdgi 0.001 \
---lr_combine 0.001 \
+--n_iterations 396 \
+--satellite_handler temporal_att \
+--name "exp4_stdgi100_0003_cb0003_hid256_iter396" \
+--lr_stdgi 0.0003 \
+--lr_combine 0.0003 \
 --use_wandb
